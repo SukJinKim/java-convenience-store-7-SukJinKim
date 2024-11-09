@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Promotions {
-    private Set<Promotion> promotions;
+    private final Set<Promotion> promotions;
 
     public Promotions() {
         this.promotions = new HashSet<>();
