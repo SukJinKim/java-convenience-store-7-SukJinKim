@@ -19,7 +19,7 @@ public class PromotionService {
     }
 
     public Set<Promotion> getPromotions() {
-        return promotions.getPromotions();
+        return promotions.get();
     }
 
     public void registerPromotionFrom(Path path) {

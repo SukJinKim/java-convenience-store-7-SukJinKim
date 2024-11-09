@@ -15,7 +15,7 @@ public class Promotions {
         return promotions.add(promotion);
     }
 
-    public Set<Promotion> getPromotions() {
+    public Set<Promotion> get() {
         return Collections.unmodifiableSet(promotions);
     }
 }
