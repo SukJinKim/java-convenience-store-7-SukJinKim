@@ -8,10 +8,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import store.model.Promotion;
+import store.model.Promotions;
 
 class PromotionServiceTest {
     private PromotionService promotionService;
@@ -32,9 +31,9 @@ class PromotionServiceTest {
         ));
 
         promotionService.registerPromotionFrom(tempFile);
-        Set<Promotion> result = promotionService.getPromotions();
+        Promotions result = promotionService.getPromotions();
 
-        assertEquals(3, result.size());
+        assertEquals(3, result.get().size());
     }
 
     @Test

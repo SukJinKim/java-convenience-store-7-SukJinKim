@@ -4,7 +4,6 @@ import static store.exception.ExceptionMessage.DUPLICATE_PROMOTION_ERROR;
 
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Set;
 import store.model.Promotion;
 import store.model.Promotions;
 import store.util.PromotionFactory;
@@ -18,8 +17,8 @@ public class PromotionService {
         this.promotions = new Promotions();
     }
 
-    public Set<Promotion> getPromotions() {
-        return promotions.get();
+    public Promotions getPromotions() {
+        return promotions;
     }
 
     public void registerPromotionFrom(Path path) {
