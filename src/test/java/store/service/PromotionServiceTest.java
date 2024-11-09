@@ -2,6 +2,8 @@ package store.service;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static store.constant.FilePath.PROMOTION_FILE_PATH;
 import static store.exception.ExceptionMessage.DUPLICATE_PROMOTION_ERROR;
 
 import java.io.IOException;
@@ -10,6 +12,7 @@ import java.nio.file.Path;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import store.model.Promotion;
 import store.model.Promotions;
 
 class PromotionServiceTest {
@@ -18,6 +21,21 @@ class PromotionServiceTest {
     @BeforeEach
     void setUp() {
         promotionService = new PromotionService();
+    }
+
+    @Test
+    void register_실제_테스트() {
+        promotionService.registerPromotionFrom(PROMOTION_FILE_PATH.getPath());
+        Promotions promotions = promotionService.getPromotions();
+        List<String> promotionNames = promotions.get().stream()
+                .map(Promotion::getName)
+                .toList();
+
+        assertTrue(promotionNames.contains("탄산2+1"));
+        assertTrue(promotionNames.contains("MD추천상품"));
+        assertTrue(promotionNames.contains("반짝할인"));
+
+        assertEquals(3, promotionNames.size());
     }
 
     @Test
