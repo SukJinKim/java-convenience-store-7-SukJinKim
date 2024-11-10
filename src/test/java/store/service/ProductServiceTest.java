@@ -11,12 +11,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import store.dto.Inventory;
 import store.dto.InventoryItem;
 import store.model.Product;
-import store.model.Products;
 import store.model.Promotion;
 import store.model.Promotions;
 
@@ -28,16 +28,19 @@ class ProductServiceTest {
     void setUp() {
         productService = new ProductService();
         promotions = new Promotions();
-        promotions.add(new Promotion("MD추천상품", 1, 1, null, null));
-        promotions.add(new Promotion("탄산2+1", 2, 1, null, null));
-        promotions.add(new Promotion("반짝할인", 1, 1, null, null));
+        promotions.add(new Promotion("MD추천상품", 1, 1,
+                LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1)));
+        promotions.add(new Promotion("탄산2+1", 2, 1,
+                LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2)));
+        promotions.add(new Promotion("반짝할인", 1, 1,
+                LocalDateTime.now().minusDays(1), LocalDateTime.now().plusDays(1)));
     }
 
     @Test
-    void registerProductOfOf_실제_테스트() {
+    void registerProductOf_실제_테스트() {
         productService.registerProductOf(PRODUCT_FILE_PATH.getPath(), promotions);
-        Products products = productService.getProducts();
-        List<String> productIds = products.get().stream()
+        Set<Product> products = productService.getProducts();
+        List<String> productIds = products.stream()
                 .map(Product::getId)
                 .toList();
 
@@ -57,11 +60,11 @@ class ProductServiceTest {
         assertTrue(productIds.contains("컵라면MD추천상품"));
         assertTrue(productIds.contains("컵라면"));
 
-        assertEquals(16, products.get().size());
+        assertEquals(16, products.size());
     }
 
     @Test
-    void registerProductOfOf_테스트() throws IOException {
+    void registerProductOf_테스트() throws IOException {
         Path tempFile = Files.createTempFile("products", ".md");
         Files.write(tempFile, List.of(
                 "name,price,quantity,promotion",
@@ -72,18 +75,19 @@ class ProductServiceTest {
         ));
 
         productService.registerProductOf(tempFile, promotions);
-        Products result = productService.getProducts();
+        Set<Product> result = productService.getProducts();
 
-        assertEquals(4, result.get().size());
+        assertEquals(4, result.size());
     }
 
     @Test
-    void registerProductOfOf_중복_예외_테스트() throws IOException {
+    void registerProductOf_중복_예외_테스트() throws IOException {
         Path tempFile = Files.createTempFile("products", ".md");
         Files.write(tempFile, List.of(
                 "name,price,quantity,promotion",
                 "콜라,1000,10,탄산2+1",
-                "콜라,1000,8,탄산2+1"
+                "콜라,1000,10,탄산2+1",
+                "사이다,1000,8,탄산2+1"
         ));
 
         assertThatThrownBy(() -> {
@@ -92,42 +96,27 @@ class ProductServiceTest {
     }
 
     @Test
-    void createInventory_테스트() {
+    void createInventory_테스트() throws IOException {
         // Given
-        Products products = productService.getProducts();
+        Path tempFile = Files.createTempFile("products", ".md");
+        Files.write(tempFile, List.of(
+                "name,price,quantity,promotion",
+                "콜라,1000,10,MD추천상품",
+                "사이다,1000,8,탄산2+1"
+        ));
 
-        Product availableForSale = Product.of("콜라", 1000, 5,
-                new Promotion("MD추천상품", 1, 1,
-                        LocalDateTime.now().minusDays(1),
-                        LocalDateTime.now().plusDays(1)
-                ));
-        Product availableForSaleWithoutPromotion = Product.of("라면", 200, 5, null);
-        Product inactivePromotion = Product.of("사이다", 1000, 5,
-                new Promotion("MD추천상품", 1, 1,
-                        LocalDateTime.now().plusDays(1),
-                        LocalDateTime.now().plusDays(2)
-                ));
-
-        products.add(availableForSale);
-        products.add(availableForSaleWithoutPromotion);
-        products.add(inactivePromotion);
+        productService.registerProductOf(tempFile, promotions);
 
         // When
         Inventory inventory = productService.createInventory();
-        System.out.println(inventory);
+
         // Then
-        assertEquals(2, inventory.getItems().size());
+        assertEquals(1, inventory.getItems().size());
 
-        InventoryItem item1 = inventory.getItems().getFirst();
-        assertEquals("콜라", item1.getName());
-        assertEquals(1000, item1.getPrice());
-        assertEquals(5, item1.getQuantity());
-        assertEquals("MD추천상품", item1.getPromotionName());
-
-        InventoryItem item2 = inventory.getItems().getLast();
-        assertEquals("라면", item2.getName());
-        assertEquals(200, item2.getPrice());
-        assertEquals(5, item2.getQuantity());
-        assertEquals("", item2.getPromotionName());
+        InventoryItem item = inventory.getItems().getFirst();
+        assertEquals("콜라", item.getName());
+        assertEquals(1000, item.getPrice());
+        assertEquals(10, item.getQuantity());
+        assertEquals("MD추천상품", item.getPromotionName());
     }
 }

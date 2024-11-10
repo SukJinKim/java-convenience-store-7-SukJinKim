@@ -10,10 +10,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import store.model.Promotion;
-import store.model.Promotions;
 
 class PromotionServiceTest {
     private PromotionService promotionService;
@@ -26,8 +26,8 @@ class PromotionServiceTest {
     @Test
     void register_실제_테스트() {
         promotionService.registerPromotionFrom(PROMOTION_FILE_PATH.getPath());
-        Promotions promotions = promotionService.getPromotions();
-        List<String> promotionNames = promotions.get().stream()
+        Set<Promotion> promotions = promotionService.getPromotions();
+        List<String> promotionNames = promotions.stream()
                 .map(Promotion::getName)
                 .toList();
 
@@ -49,9 +49,9 @@ class PromotionServiceTest {
         ));
 
         promotionService.registerPromotionFrom(tempFile);
-        Promotions result = promotionService.getPromotions();
+        Set<Promotion> result = promotionService.getPromotions();
 
-        assertEquals(3, result.get().size());
+        assertEquals(3, result.size());
     }
 
     @Test

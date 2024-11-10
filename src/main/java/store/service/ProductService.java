@@ -4,6 +4,7 @@ import static store.exception.ExceptionMessage.DUPLICATE_PRODUCT_ERROR;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Set;
 import store.dto.Inventory;
 import store.dto.InventoryItem;
 import store.model.Product;
@@ -20,8 +21,8 @@ public class ProductService {
         this.products = new Products();
     }
 
-    public Products getProducts() {
-        return products;
+    public Set<Product> getProducts() {
+        return products.get();
     }
 
     public Products registerProductOf(Path path, Promotions promotions) {
