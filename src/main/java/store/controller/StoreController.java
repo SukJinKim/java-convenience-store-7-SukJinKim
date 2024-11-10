@@ -40,7 +40,7 @@ public class StoreController {
             ShoppingCart cart = addOrdersToCart(orders);
             boolean hasMemberShipDiscount = inputView.askMemberShipDiscount();
             outputView.showReceipt(Receipt.of(cart, hasMemberShipDiscount));
-            // TODO productService에 cart반영하기
+            productService.update(cart);
         } while (inputView.askRetry());
     }
 

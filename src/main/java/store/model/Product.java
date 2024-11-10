@@ -106,6 +106,10 @@ public class Product {
         return promotion.getGet();
     }
 
+    public void reduceStock(int purchaseQuantity) {
+        quantity -= purchaseQuantity;
+    }
+
     private boolean hasEnoughStock(int buy, int get) {
         return quantity >= (buy + get);
     }

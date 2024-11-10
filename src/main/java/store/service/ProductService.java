@@ -16,6 +16,8 @@ import store.model.Orders;
 import store.model.Product;
 import store.model.Products;
 import store.model.Promotions;
+import store.model.ShoppingCart;
+import store.model.ShoppingItem;
 import store.util.ProductFactory;
 import store.util.ProductParser;
 import store.util.PromotionReader;
@@ -80,6 +82,18 @@ public class ProductService {
                 throw new IllegalArgumentException(DUPLICATE_PRODUCT_ERROR.getMessage());
             }
         });
+    }
+
+    public void update(ShoppingCart cart) {
+        for (ShoppingItem item : cart.getShoppingItems()) {
+            String productId = item.productId();
+            int purchaseQuantity = item.purchaseQuantity();
+
+            products.get().stream()
+                    .filter(product -> product.getId().equals(productId))
+                    .findFirst()
+                    .ifPresent(product -> product.reduceStock(purchaseQuantity));
+        }
     }
 
     private List<InventoryItem> createInventoryItems() {
