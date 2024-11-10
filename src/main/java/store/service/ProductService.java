@@ -56,6 +56,6 @@ public class ProductService {
     }
 
     private void update() {
-        products.removeIf(Product::availableForSale);
+        products.removeIf(Product::notAvailableForSale);
     }
 }

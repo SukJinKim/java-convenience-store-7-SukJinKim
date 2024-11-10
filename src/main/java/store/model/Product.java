@@ -70,11 +70,11 @@ public class Product {
         return Objects.hashCode(id);
     }
 
-    public boolean availableForSale() {
+    public boolean notAvailableForSale() {
         if (isPromotional()) {
-            return promotion.isActiveOn(DateTimes.now());
+            return !promotion.isActiveOn(DateTimes.now());
         }
-        return true;
+        return false;
     }
 
     private boolean isPromotional() {
