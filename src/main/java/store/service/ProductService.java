@@ -4,6 +4,8 @@ import static store.exception.ExceptionMessage.DUPLICATE_PRODUCT_ERROR;
 
 import java.nio.file.Path;
 import java.util.List;
+import store.dto.Inventory;
+import store.dto.InventoryItem;
 import store.model.Product;
 import store.model.Products;
 import store.model.Promotions;
@@ -29,6 +31,13 @@ public class ProductService {
         return products;
     }
 
+    public Inventory createInventory() {
+        Inventory inventory = new Inventory();
+        List<InventoryItem> inventoryItems = createInventoryItems();
+        inventoryItems.forEach(inventory::add);
+        return inventory;
+    }
+
     private void registerProduct(Promotions promotions, List<List<String>> parsed) {
         parsed.forEach(p -> {
             Product product = ProductFactory.create(p, promotions);
@@ -37,5 +46,17 @@ public class ProductService {
                 throw new IllegalArgumentException(DUPLICATE_PRODUCT_ERROR.getMessage());
             }
         });
+    }
+
+    private List<InventoryItem> createInventoryItems() {
+        return products.get().stream()
+                .filter(Product::availableForSale)
+                .map(p -> new InventoryItem(
+                        p.getName(),
+                        p.getPrice(),
+                        p.getQuantity(),
+                        p.getPromotionName()
+                ))
+                .toList();
     }
 }
