@@ -22,10 +22,11 @@ public class ProductService {
         return products;
     }
 
-    public void registerProductFrom(Path path, Promotions promotions) {
+    public Products registerProductFrom(Path path, Promotions promotions) {
         List<String> fileContents = PromotionReader.read(path);
         List<List<String>> parsed = fileContents.stream().map(ProductParser::parse).toList();
         registerProduct(promotions, parsed);
+        return products;
     }
 
     private void registerProduct(Promotions promotions, List<List<String>> parsed) {

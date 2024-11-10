@@ -21,7 +21,7 @@ public class PromotionService {
         return promotions;
     }
 
-    public void registerPromotionFrom(Path path) {
+    public Promotions registerPromotionFrom(Path path) {
         List<String> fileContents = PromotionReader.read(path);
         List<Promotion> preprocessed = preprocess(fileContents);
         preprocessed.forEach(promotion -> {
@@ -30,6 +30,7 @@ public class PromotionService {
                 throw new IllegalArgumentException(DUPLICATE_PROMOTION_ERROR.getMessage());
             }
         });
+        return promotions;
     }
 
     private List<Promotion> preprocess(List<String> fileContents) {
