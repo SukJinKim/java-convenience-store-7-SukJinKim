@@ -98,7 +98,7 @@ class ProductServiceTest {
 
         Product availableForSale = Product.of("콜라", 1000, 5,
                 new Promotion("MD추천상품", 1, 1,
-                        LocalDateTime.now(),
+                        LocalDateTime.now().minusDays(1),
                         LocalDateTime.now().plusDays(1)
                 ));
         Product availableForSaleWithoutPromotion = Product.of("라면", 200, 5, null);
@@ -114,7 +114,7 @@ class ProductServiceTest {
 
         // When
         Inventory inventory = productService.createInventory();
-
+        System.out.println(inventory);
         // Then
         assertEquals(2, inventory.getItems().size());
 
