@@ -59,4 +59,9 @@ public class Promotion {
     public String toString() {
         return name;
     }
+
+    public boolean isActiveOn(LocalDateTime now) {
+        return (now.isEqual(startDate) || now.isAfter(startDate))
+                && (now.isEqual(endDate) || now.isBefore(endDate));
+    }
 }
