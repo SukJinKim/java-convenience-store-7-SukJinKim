@@ -1,6 +1,7 @@
 package store.view;
 
 import store.dto.Inventory;
+import store.dto.Receipt;
 
 public class OutputView {
     private static final String HELLO = "안녕하세요. W편의점입니다.";
@@ -17,5 +18,9 @@ public class OutputView {
 
     public void displayError(String message) {
         System.out.println(message);
+    }
+
+    public void showReceipt(Receipt receipt) {
+        System.out.println(receipt);
     }
 }

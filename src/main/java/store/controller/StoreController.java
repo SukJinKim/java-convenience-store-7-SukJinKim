@@ -4,6 +4,7 @@ import static store.constant.FilePath.PRODUCT_FILE_PATH;
 import static store.constant.FilePath.PROMOTION_FILE_PATH;
 
 import store.dto.Inventory;
+import store.dto.Receipt;
 import store.model.Order;
 import store.model.Orders;
 import store.model.Product;
@@ -38,6 +39,8 @@ public class StoreController {
             Orders orders = takeOrder();
             ShoppingCart cart = addOrdersToCart(orders);
             boolean hasMemberShipDiscount = inputView.askMemberShipDiscount();
+            outputView.showReceipt(Receipt.of(cart, hasMemberShipDiscount));
+            // TODO productService에 cart반영하기
             // TODO cart와 멤버십 할인 여부 합해서 Receipt이라는 dto 생성하고 출력하기
             // TODO 재구매 여부 묻기
             break;
@@ -102,7 +105,7 @@ public class StoreController {
 
     private void addToCart(Order order, ShoppingCart cart, Product product, int purchaseQuantity, int freeQuantity) {
         order.minusQuantity(purchaseQuantity);
-        cart.add(new ShoppingItem(product.getId(), product.getName(), purchaseQuantity, freeQuantity));
+        cart.add(new ShoppingItem(product.getId(), product.getName(), product.getPrice(), purchaseQuantity, freeQuantity));
     }
 
     private void handleInsufficientPromotionalStock(ShoppingCart cart, Order order, Product promotionalProduct,
@@ -135,7 +138,6 @@ public class StoreController {
         if (order.getQuantity() <= 0) {
             return;
         }
-
         Product nonPromotionalProduct = productService.findNonPromotionalProductByName(order.getProductName());
         if (exists(nonPromotionalProduct)) {
             addToCart(order, cart, nonPromotionalProduct, order.getQuantity(), 0);
