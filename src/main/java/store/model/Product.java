@@ -1,5 +1,6 @@
 package store.model;
 
+import camp.nextstep.edu.missionutils.DateTimes;
 import java.util.Objects;
 
 public class Product {
@@ -60,6 +61,17 @@ public class Product {
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
+    }
+
+    public boolean availableForSale() {
+        if (isPromotional()) {
+            return promotion.isActiveOn(DateTimes.now());
+        }
+        return true;
+    }
+
+    private boolean isPromotional() {
+        return promotion != null;
     }
 
     private static String generateId(String name, Promotion promotion) {
