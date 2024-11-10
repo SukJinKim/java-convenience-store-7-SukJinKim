@@ -32,6 +32,7 @@ public class ProductService {
     }
 
     public Inventory createInventory() {
+        update();
         Inventory inventory = new Inventory();
         List<InventoryItem> inventoryItems = createInventoryItems();
         inventoryItems.forEach(inventory::add);
@@ -50,13 +51,11 @@ public class ProductService {
 
     private List<InventoryItem> createInventoryItems() {
         return products.get().stream()
-                .filter(Product::availableForSale)
-                .map(p -> new InventoryItem(
-                        p.getName(),
-                        p.getPrice(),
-                        p.getQuantity(),
-                        p.getPromotionName()
-                ))
+                .map(p -> new InventoryItem(p.getName(), p.getPrice(), p.getQuantity(), p.getPromotionName()))
                 .toList();
+    }
+
+    private void update() {
+        products.removeIf(Product::availableForSale);
     }
 }
