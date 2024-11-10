@@ -26,7 +26,7 @@ class OrderServiceTest {
 
 
     @ParameterizedTest(name = "{arguments} 입력")
-    @ValueSource(strings = {"[사이다  - 2]","[사이다]", "[-1]", "사이다-2", ""})
+    @ValueSource(strings = {"[사이다  - 2]","[사이다]", "[-1]", "사이다-2", "", "[사이다-0]"})
     void createOrders_예외_테스트(String userInput) {
         assertThatThrownBy(() -> {
             orderService.createOrders(userInput);
