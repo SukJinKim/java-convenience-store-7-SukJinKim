@@ -24,10 +24,10 @@ public class ProductService {
         return products;
     }
 
-    public Products registerProductFrom(Path path, Promotions promotions) {
+    public Products registerProductOf(Path path, Promotions promotions) {
         List<String> fileContents = PromotionReader.read(path);
         List<List<String>> parsed = fileContents.stream().map(ProductParser::parse).toList();
-        registerProduct(promotions, parsed);
+        registerProductOf(parsed, promotions);
         return products;
     }
 
@@ -38,7 +38,7 @@ public class ProductService {
         return inventory;
     }
 
-    private void registerProduct(Promotions promotions, List<List<String>> parsed) {
+    private void registerProductOf(List<List<String>> parsed, Promotions promotions) {
         parsed.forEach(p -> {
             Product product = ProductFactory.create(p, promotions);
             boolean isDuplicated = !products.add(product);

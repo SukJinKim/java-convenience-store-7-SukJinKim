@@ -34,8 +34,8 @@ class ProductServiceTest {
     }
 
     @Test
-    void registerProductFrom_실제_테스트() {
-        productService.registerProductFrom(PRODUCT_FILE_PATH.getPath(), promotions);
+    void registerProductOfOf_실제_테스트() {
+        productService.registerProductOf(PRODUCT_FILE_PATH.getPath(), promotions);
         Products products = productService.getProducts();
         List<String> productIds = products.get().stream()
                 .map(Product::getId)
@@ -61,7 +61,7 @@ class ProductServiceTest {
     }
 
     @Test
-    void registerProductFrom_테스트() throws IOException {
+    void registerProductOfOf_테스트() throws IOException {
         Path tempFile = Files.createTempFile("products", ".md");
         Files.write(tempFile, List.of(
                 "name,price,quantity,promotion",
@@ -71,14 +71,14 @@ class ProductServiceTest {
                 "사이다,1000,7,null"
         ));
 
-        productService.registerProductFrom(tempFile, promotions);
+        productService.registerProductOf(tempFile, promotions);
         Products result = productService.getProducts();
 
         assertEquals(4, result.get().size());
     }
 
     @Test
-    void registerProductFrom_중복_예외_테스트() throws IOException {
+    void registerProductOfOf_중복_예외_테스트() throws IOException {
         Path tempFile = Files.createTempFile("products", ".md");
         Files.write(tempFile, List.of(
                 "name,price,quantity,promotion",
@@ -87,7 +87,7 @@ class ProductServiceTest {
         ));
 
         assertThatThrownBy(() -> {
-            productService.registerProductFrom(tempFile, promotions);
+            productService.registerProductOf(tempFile, promotions);
         }).isInstanceOf(IllegalArgumentException.class).hasMessage(DUPLICATE_PRODUCT_ERROR.getMessage());
     }
 
