@@ -50,6 +50,28 @@ public class ProductService {
         validateStockAvailability(orders);
     }
 
+    public List<Product> findByName(String productName) {
+        return products.get().stream()
+                .filter(product -> productName.equals(product.getName()))
+                .toList();
+    }
+
+    public Product findPromotionalProductByName(String productName) {
+        return findByName(productName).stream()
+                .filter(Product::isPromotional)
+                .filter(product -> product.getQuantity() > 0)
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Product findNonPromotionalProductByName(String productName) {
+        return findByName(productName).stream()
+                .filter(p -> !p.isPromotional())
+                .filter(p -> p.getQuantity() > 0)
+                .findFirst()
+                .orElse(null);
+    }
+
     private void registerProductOf(List<List<String>> parsed, Promotions promotions) {
         parsed.forEach(p -> {
             Product product = ProductFactory.create(p, promotions);

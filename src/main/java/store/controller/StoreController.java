@@ -4,8 +4,12 @@ import static store.constant.FilePath.PRODUCT_FILE_PATH;
 import static store.constant.FilePath.PROMOTION_FILE_PATH;
 
 import store.dto.Inventory;
+import store.model.Order;
 import store.model.Orders;
+import store.model.Product;
 import store.model.Promotions;
+import store.model.ShoppingCart;
+import store.model.ShoppingItem;
 import store.service.OrderService;
 import store.service.ProductService;
 import store.service.PromotionService;
@@ -29,10 +33,14 @@ public class StoreController {
 
     public void run() {
         registerProduct();
-        while(true) {
+        while (true) {
             greet();
             Orders orders = takeOrder();
-            // TODO 구매 로직 작성
+            ShoppingCart cart = addOrdersToCart(orders);
+            // TODO 멤버십 할인 여부 묻기
+            // TODO cart와 멤버십 할인 여부 합해서 Receipt이라는 dto 생성하고 출력하기
+            // TODO 재구매 여부 묻기
+            break;
         }
     }
 
@@ -56,6 +64,81 @@ public class StoreController {
             } catch (Exception e) {
                 outputView.displayError(e.getMessage());
             }
+        }
+    }
+
+    private ShoppingCart addOrdersToCart(Orders orders) {
+        ShoppingCart cart = new ShoppingCart();
+
+        for (Order order : orders.get()) {
+            processPromotionalOrder(cart, order);
+            processNonPromotionalOrder(cart, order);
+        }
+
+        return cart;
+    }
+
+    private void processPromotionalOrder(ShoppingCart cart, Order order) {
+        Product promotionalProduct = productService.findPromotionalProductByName(order.getProductName());
+        if (!exists(promotionalProduct)) {
+            return;
+        }
+
+        int orderedQuantity = adjustOrderQuantity(order, promotionalProduct);
+        int stock = promotionalProduct.getQuantity();
+
+        if (stock >= orderedQuantity) {
+            addToCart(order, cart, promotionalProduct, orderedQuantity,
+                    promotionalProduct.calcFreeQuantity(orderedQuantity));
+        }
+        if (stock < orderedQuantity) {
+            handleInsufficientPromotionalStock(cart, order, promotionalProduct, stock);
+        }
+    }
+
+    private boolean exists(Product product) {
+        return product != null;
+    }
+
+    private void addToCart(Order order, ShoppingCart cart, Product product, int purchaseQuantity, int freeQuantity) {
+        order.minusQuantity(purchaseQuantity);
+        cart.add(new ShoppingItem(product.getId(), product.getName(), purchaseQuantity, freeQuantity));
+    }
+
+    private void handleInsufficientPromotionalStock(ShoppingCart cart, Order order, Product promotionalProduct,
+                                                    int stock) {
+        int purchaseQuantity = stock;
+        int freeQuantity = promotionalProduct.calcFreeQuantity(purchaseQuantity);
+        int promotionalQuantity = promotionalProduct.calcPromotionalQuantity(purchaseQuantity);
+        int nonPromotionalQuantity = order.getQuantity() - promotionalQuantity;
+
+        boolean response = inputView.notifyNotAvailablePromotion(order.getProductName(), nonPromotionalQuantity);
+        if (response) {
+            addToCart(order, cart, promotionalProduct, purchaseQuantity, freeQuantity);
+        }
+        if (!response) {
+            addToCart(order, cart, promotionalProduct, promotionalQuantity,
+                    promotionalProduct.calcFreeQuantity(promotionalQuantity));
+        }
+    }
+
+    private int adjustOrderQuantity(Order order, Product promotionalProduct) {
+        int orderedQuantity = order.getQuantity();
+        if (promotionalProduct.lessOrdered(orderedQuantity) &&
+            inputView.notifyLessOrdered(order.getProductName(), promotionalProduct.getGet())) {
+            orderedQuantity += promotionalProduct.getGet();
+        }
+        return orderedQuantity;
+    }
+
+    private void processNonPromotionalOrder(ShoppingCart cart, Order order) {
+        if (order.getQuantity() <= 0) {
+            return;
+        }
+
+        Product nonPromotionalProduct = productService.findNonPromotionalProductByName(order.getProductName());
+        if (exists(nonPromotionalProduct)) {
+            addToCart(order, cart, nonPromotionalProduct, order.getQuantity(), 0);
         }
     }
 }

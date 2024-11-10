@@ -77,8 +77,37 @@ public class Product {
         return false;
     }
 
-    private boolean isPromotional() {
+    public boolean isPromotional() {
         return promotion != null;
+    }
+
+    public int calcFreeQuantity(int purchaseQuantity) {
+        int buy = promotion.getBuy();
+        int get = promotion.getGet();
+        return purchaseQuantity / (buy + get);
+    }
+
+    public int calcPromotionalQuantity(int purchaseQuantity) {
+        int buy = promotion.getBuy();
+        int get = promotion.getGet();
+        return (purchaseQuantity / (buy + get)) * (buy + get);
+    }
+
+    public boolean lessOrdered(int orderedQuantity) {
+        if (!isPromotional()) {
+            return false;
+        }
+        int buy = promotion.getBuy();
+        int get = promotion.getGet();
+        return hasEnoughStock(buy, get) && (buy == orderedQuantity);
+    }
+
+    public int getGet() {
+        return promotion.getGet();
+    }
+
+    private boolean hasEnoughStock(int buy, int get) {
+        return quantity >= (buy + get);
     }
 
     private static String generateId(String name, Promotion promotion) {

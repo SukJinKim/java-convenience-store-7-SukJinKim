@@ -2,7 +2,7 @@ package store.model;
 
 public class Order {
     private final String productName;
-    private final int quantity;
+    private int quantity;
 
     public Order(String productName, int quantity) {
         this.productName = productName;
@@ -15,5 +15,9 @@ public class Order {
 
     public int getQuantity() {
         return quantity;
+    }
+
+    public void minusQuantity(int quantity) {
+        this.quantity -= quantity;
     }
 }

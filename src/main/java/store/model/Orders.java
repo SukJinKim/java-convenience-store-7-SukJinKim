@@ -13,4 +13,10 @@ public class Orders {
     public List<Order> get() {
         return Collections.unmodifiableList(orders);
     }
+
+    public List<String> getOrderedProductNames() {
+        return orders.stream()
+                .map(Order::getProductName)
+                .toList();
+    }
 }
