@@ -37,7 +37,7 @@ public class StoreController {
             greet();
             Orders orders = takeOrder();
             ShoppingCart cart = addOrdersToCart(orders);
-            // TODO 멤버십 할인 여부 묻기
+            boolean hasMemberShipDiscount = inputView.askMemberShipDiscount();
             // TODO cart와 멤버십 할인 여부 합해서 Receipt이라는 dto 생성하고 출력하기
             // TODO 재구매 여부 묻기
             break;
