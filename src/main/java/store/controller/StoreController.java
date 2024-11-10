@@ -34,17 +34,14 @@ public class StoreController {
 
     public void run() {
         registerProduct();
-        while (true) {
+        do {
             greet();
             Orders orders = takeOrder();
             ShoppingCart cart = addOrdersToCart(orders);
             boolean hasMemberShipDiscount = inputView.askMemberShipDiscount();
             outputView.showReceipt(Receipt.of(cart, hasMemberShipDiscount));
             // TODO productService에 cart반영하기
-            // TODO cart와 멤버십 할인 여부 합해서 Receipt이라는 dto 생성하고 출력하기
-            // TODO 재구매 여부 묻기
-            break;
-        }
+        } while (inputView.askRetry());
     }
 
     private void registerProduct() {

@@ -10,6 +10,7 @@ public class InputView {
     private static final String NOTIFY_NOT_AVAILABLE_PROMOTION =
             "현재 %s %,d개는 프로모션 할인이 적용되지 않습니다. 그래도 구매하시겠습니까? (Y/N)";
     private static final String ASK_MEMBERSHIP_DISCOUNT = "멤버십 할인을 받으시겠습니까? (Y/N)";
+    private static final String ASK_RETRY = "감사합니다. 구매하고 싶은 다른 상품이 있나요? (Y/N)";
 
     public String requestOrders() {
         System.out.println(REQUEST_ORDERS);
@@ -40,6 +41,17 @@ public class InputView {
 
     public boolean askMemberShipDiscount() {
         System.out.println(ASK_MEMBERSHIP_DISCOUNT);
+        while (true) {
+            try {
+                return receiveResponse();
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    public boolean askRetry() {
+        System.out.println(ASK_RETRY);
         while (true) {
             try {
                 return receiveResponse();
