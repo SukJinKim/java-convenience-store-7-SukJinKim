@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import store.model.Order;
 
 public class OrderFactory {
-    private static final String VALID_FORMAT = "^\\[(?<productName>[^\\s\\-]+)\\-(?<quantity>\\d+)\\]$";
+    private static final String VALID_FORMAT = "^\\[(?<productName>[^\\s\\-]+)\\-(?<quantity>[1-9][0-9]*+)\\]$";
     private static final Pattern VALID_PATTERN = Pattern.compile(VALID_FORMAT);
 
     private OrderFactory() {
