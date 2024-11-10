@@ -25,10 +25,16 @@ public class StoreController {
 
     public void run() {
         Products products = registerProduct();
+        greet();
     }
 
     private Products registerProduct() {
         Promotions promotions = promotionService.registerPromotionFrom(PROMOTION_FILE_PATH.getPath());
         return productService.registerProductFrom(PRODUCT_FILE_PATH.getPath(), promotions);
+    }
+
+    private void greet() {
+        outputView.sayHello();
+        outputView.showInventory(productService.createInventory());
     }
 }
