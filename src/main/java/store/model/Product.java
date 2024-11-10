@@ -70,7 +70,7 @@ public class Product {
         return Objects.hashCode(id);
     }
 
-    public boolean notAvailableForSale() {
+    public boolean isNotForSale() {
         if (isPromotional()) {
             return !promotion.isActiveOn(DateTimes.now());
         }
