@@ -72,7 +72,9 @@ public class StoreController {
 
         for (Order order : orders.get()) {
             processPromotionalOrder(cart, order);
-            processNonPromotionalOrder(cart, order);
+            if (order.getQuantity() > 0) {
+                processNonPromotionalOrder(cart, order);
+            }
         }
 
         return cart;
@@ -102,7 +104,16 @@ public class StoreController {
 
     private void addToCart(Order order, ShoppingCart cart, Product product, int purchaseQuantity, int freeQuantity) {
         order.minusQuantity(purchaseQuantity);
-        cart.add(new ShoppingItem(product.getId(), product.getName(), product.getPrice(), purchaseQuantity, freeQuantity));
+        cart.add(new ShoppingItem(product.getId(),
+                product.getName(), product.getPrice(),
+                purchaseQuantity, freeQuantity));
+    }
+
+    private void addAdjustedToCart(Order order, ShoppingCart cart, Product product, int purchaseQuantity, int freeQuantity) {
+        order.zeroQuantity();
+        cart.add(new ShoppingItem(product.getId(),
+                product.getName(), product.getPrice(),
+                purchaseQuantity, freeQuantity));
     }
 
     private void handleInsufficientPromotionalStock(ShoppingCart cart, Order order, Product promotionalProduct,
@@ -117,7 +128,7 @@ public class StoreController {
             addToCart(order, cart, promotionalProduct, purchaseQuantity, freeQuantity);
         }
         if (!response) {
-            addToCart(order, cart, promotionalProduct, promotionalQuantity,
+            addAdjustedToCart(order, cart, promotionalProduct, promotionalQuantity,
                     promotionalProduct.calcFreeQuantity(promotionalQuantity));
         }
     }

@@ -20,4 +20,8 @@ public class Order {
     public void minusQuantity(int quantity) {
         this.quantity -= quantity;
     }
+
+    public void zeroQuantity() {
+        this.quantity = 0;
+    }
 }
