@@ -14,4 +14,8 @@ public class OutputView {
         System.out.println(GUIDE_INVENTORY + System.lineSeparator());
         System.out.println(inventory);
     }
+
+    public void displayError(String message) {
+        System.out.println(message);
+    }
 }

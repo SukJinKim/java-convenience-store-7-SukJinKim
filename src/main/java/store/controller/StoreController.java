@@ -3,8 +3,10 @@ package store.controller;
 import static store.constant.FilePath.PRODUCT_FILE_PATH;
 import static store.constant.FilePath.PROMOTION_FILE_PATH;
 
-import store.model.Products;
+import store.dto.Inventory;
+import store.model.Orders;
 import store.model.Promotions;
+import store.service.OrderService;
 import store.service.ProductService;
 import store.service.PromotionService;
 import store.view.InputView;
@@ -15,26 +17,45 @@ public class StoreController {
     private OutputView outputView;
     private PromotionService promotionService;
     private ProductService productService;
+    private OrderService orderService;
 
     public StoreController() {
         this.inputView = new InputView();
         this.outputView = new OutputView();
         this.promotionService = new PromotionService();
         this.productService = new ProductService();
+        this.orderService = new OrderService();
     }
 
     public void run() {
-        Products products = registerProduct();
-        greet();
+        registerProduct();
+        while(true) {
+            greet();
+            Orders orders = takeOrder();
+            // TODO 구매 로직 작성
+        }
     }
 
-    private Products registerProduct() {
+    private void registerProduct() {
         Promotions promotions = promotionService.registerPromotionFrom(PROMOTION_FILE_PATH.getPath());
-        return productService.registerProductFrom(PRODUCT_FILE_PATH.getPath(), promotions);
+        productService.registerProductOf(PRODUCT_FILE_PATH.getPath(), promotions);
     }
 
     private void greet() {
         outputView.sayHello();
-        outputView.showInventory(productService.createInventory());
+        Inventory inventory = productService.createInventory();
+        outputView.showInventory(inventory);
+    }
+
+    private Orders takeOrder() {
+        while (true) {
+            try {
+                Orders orders = orderService.createOrders(inputView.requestOrders());
+                productService.reviewOrders(orders);
+                return orders;
+            } catch (Exception e) {
+                outputView.displayError(e.getMessage());
+            }
+        }
     }
 }
