@@ -46,6 +46,13 @@ public class Product {
         return promotion;
     }
 
+    public String getPromotionName() {
+        if (isPromotional()) {
+            return promotion.getName();
+        }
+        return "";
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
