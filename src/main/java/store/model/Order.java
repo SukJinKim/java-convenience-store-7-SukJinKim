@@ -28,4 +28,8 @@ public class Order {
     public boolean hasQuantity() {
         return quantity > 0;
     }
+
+    public boolean hasNoQuantity() {
+        return !hasQuantity();
+    }
 }
