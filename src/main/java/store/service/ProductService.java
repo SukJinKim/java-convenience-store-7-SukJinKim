@@ -35,15 +35,20 @@ public class ProductService {
 
     public void registerProductOf(Path path, Promotions promotions) {
         List<String> fileContents = PromotionReader.read(path);
-        List<List<String>> parsed = fileContents.stream().map(ProductParser::parse).toList();
+        List<List<String>> parsed = fileContents.stream()
+                .map(ProductParser::parse)
+                .toList();
+
         registerProductOf(parsed, promotions);
     }
 
     public Inventory createInventory() {
         update();
+
         Inventory inventory = new Inventory();
         List<InventoryItem> inventoryItems = createInventoryItems();
         inventoryItems.forEach(inventory::add);
+
         return inventory;
     }
 
@@ -61,15 +66,15 @@ public class ProductService {
     public Product findPromotionalProductByName(String productName) {
         return findByName(productName).stream()
                 .filter(Product::isPromotional)
-                .filter(product -> product.getQuantity() > 0)
+                .filter(Product::hasQuantity)
                 .findFirst()
                 .orElse(null);
     }
 
     public Product findNonPromotionalProductByName(String productName) {
         return findByName(productName).stream()
-                .filter(p -> !p.isPromotional())
-                .filter(p -> p.getQuantity() > 0)
+                .filter(Product::isNonPromotional)
+                .filter(Product::hasQuantity)
                 .findFirst()
                 .orElse(null);
     }

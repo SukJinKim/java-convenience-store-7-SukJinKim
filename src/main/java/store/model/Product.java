@@ -81,6 +81,10 @@ public class Product {
         return promotion != null;
     }
 
+    public boolean isNonPromotional() {
+        return !isPromotional();
+    }
+
     public int calcFreeQuantity(int purchaseQuantity) {
         int buy = promotion.getBuy();
         int get = promotion.getGet();
@@ -108,6 +112,10 @@ public class Product {
 
     public void reduceStock(int purchaseQuantity) {
         quantity -= purchaseQuantity;
+    }
+
+    public boolean hasQuantity() {
+        return quantity > 0;
     }
 
     private boolean hasEnoughStock(int buy, int get) {
