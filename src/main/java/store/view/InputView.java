@@ -14,11 +14,13 @@ public class InputView {
 
     public String requestOrders() {
         System.out.println(REQUEST_ORDERS);
+
         return Console.readLine();
     }
 
     public boolean notifyLessOrdered(String productName, int freeQuantity) {
         System.out.println(String.format(NOTIFY_LESS_ORDERED, productName, freeQuantity));
+
         while (true) {
             try {
                 return receiveResponse();
@@ -30,6 +32,7 @@ public class InputView {
 
     public boolean notifyNotAvailablePromotion(String productName, int nonPromotionalQuantity) {
         System.out.println(String.format(NOTIFY_NOT_AVAILABLE_PROMOTION, productName, nonPromotionalQuantity));
+
         while (true) {
             try {
                 return receiveResponse();
@@ -41,6 +44,7 @@ public class InputView {
 
     public boolean askMemberShipDiscount() {
         System.out.println(ASK_MEMBERSHIP_DISCOUNT);
+
         while (true) {
             try {
                 return receiveResponse();
@@ -52,6 +56,7 @@ public class InputView {
 
     public boolean askRetry() {
         System.out.println(ASK_RETRY);
+
         while (true) {
             try {
                 return receiveResponse();
@@ -63,12 +68,14 @@ public class InputView {
 
     private static boolean receiveResponse() {
         String response = Console.readLine();
+
         if (response.equalsIgnoreCase("Y")) {
             return true;
         }
         if (response.equalsIgnoreCase("N")) {
             return false;
         }
+
         throw new IllegalArgumentException(INVALID_INPUT.getMessage());
     }
 }
