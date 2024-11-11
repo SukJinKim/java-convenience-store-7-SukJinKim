@@ -72,7 +72,7 @@ public class StoreController {
 
         for (Order order : orders.get()) {
             processPromotionalOrder(cart, order);
-            if (order.getQuantity() > 0) {
+            if (order.hasQuantity()) {
                 processNonPromotionalOrder(cart, order);
             }
         }
@@ -85,17 +85,19 @@ public class StoreController {
         if (!exists(promotionalProduct)) {
             return;
         }
-
         int orderedQuantity = adjustOrderQuantity(order, promotionalProduct);
         int stock = promotionalProduct.getQuantity();
-
         if (stock >= orderedQuantity) {
-            addToCart(order, cart, promotionalProduct, orderedQuantity,
-                    promotionalProduct.calcFreeQuantity(orderedQuantity));
+            handleSufficientPromotionalStock(cart, order, promotionalProduct, orderedQuantity);
+            return;
         }
-        if (stock < orderedQuantity) {
-            handleInsufficientPromotionalStock(cart, order, promotionalProduct, stock);
-        }
+        handleInsufficientPromotionalStock(cart, order, promotionalProduct, stock);
+    }
+
+    private void handleSufficientPromotionalStock(ShoppingCart cart, Order order,
+                                                  Product promotionalProduct, int orderedQuantity) {
+        int freeQuantity = promotionalProduct.calcFreeQuantity(orderedQuantity);
+        addToCart(order, cart, promotionalProduct, orderedQuantity, freeQuantity);
     }
 
     private boolean exists(Product product) {
@@ -103,50 +105,64 @@ public class StoreController {
     }
 
     private void addToCart(Order order, ShoppingCart cart, Product product, int purchaseQuantity, int freeQuantity) {
-        order.minusQuantity(purchaseQuantity);
-        cart.add(new ShoppingItem(product.getId(),
-                product.getName(), product.getPrice(),
-                purchaseQuantity, freeQuantity));
+        order.reduceQuantity(purchaseQuantity);
+        cart.add(new ShoppingItem(product.getId(), product.getName(), product.getPrice(),
+                                purchaseQuantity, freeQuantity));
     }
 
-    private void addAdjustedToCart(Order order, ShoppingCart cart, Product product, int purchaseQuantity, int freeQuantity) {
-        order.zeroQuantity();
-        cart.add(new ShoppingItem(product.getId(),
-                product.getName(), product.getPrice(),
-                purchaseQuantity, freeQuantity));
+    private void addAdjustedToCart(Order order, ShoppingCart cart,
+                                   Product product, int purchaseQuantity, int freeQuantity) {
+        order.reduceAllQuantity();
+        cart.add(new ShoppingItem(product.getId(), product.getName(), product.getPrice(),
+                                purchaseQuantity, freeQuantity));
     }
 
-    private void handleInsufficientPromotionalStock(ShoppingCart cart, Order order, Product promotionalProduct,
-                                                    int stock) {
-        int purchaseQuantity = stock;
-        int freeQuantity = promotionalProduct.calcFreeQuantity(purchaseQuantity);
-        int promotionalQuantity = promotionalProduct.calcPromotionalQuantity(purchaseQuantity);
+    private void handleInsufficientPromotionalStock(ShoppingCart cart, Order order,
+                                                    Product promotionalProduct, int stock) {
+        int promotionalQuantity = promotionalProduct.calcPromotionalQuantity(stock);
         int nonPromotionalQuantity = order.getQuantity() - promotionalQuantity;
 
-        boolean response = inputView.notifyNotAvailablePromotion(order.getProductName(), nonPromotionalQuantity);
-        if (response) {
-            addToCart(order, cart, promotionalProduct, purchaseQuantity, freeQuantity);
+        if (inputView.notifyNotAvailablePromotion(order.getProductName(), nonPromotionalQuantity)) {
+            addPromotionalItemsToCart(cart, order, promotionalProduct, stock);
+            return;
         }
-        if (!response) {
-            addAdjustedToCart(order, cart, promotionalProduct, promotionalQuantity,
-                    promotionalProduct.calcFreeQuantity(promotionalQuantity));
-        }
+
+        addAdjustedItemsToCart(cart, order, promotionalProduct, promotionalQuantity);
+    }
+
+    private void addPromotionalItemsToCart(ShoppingCart cart, Order order, Product promotionalProduct, int stock) {
+        int freeQuantity = promotionalProduct.calcFreeQuantity(stock);
+
+        addToCart(order, cart, promotionalProduct, stock, freeQuantity);
+    }
+
+    private void addAdjustedItemsToCart(ShoppingCart cart, Order order,
+                                        Product promotionalProduct, int promotionalQuantity) {
+        int adjustedFreeQuantity = promotionalProduct.calcFreeQuantity(promotionalQuantity);
+
+        addAdjustedToCart(order, cart, promotionalProduct, promotionalQuantity, adjustedFreeQuantity);
     }
 
     private int adjustOrderQuantity(Order order, Product promotionalProduct) {
         int orderedQuantity = order.getQuantity();
-        if (promotionalProduct.lessOrdered(orderedQuantity) &&
-            inputView.notifyLessOrdered(order.getProductName(), promotionalProduct.getGet())) {
-            orderedQuantity += promotionalProduct.getGet();
+        int get = promotionalProduct.getGet();
+
+        if (promotionalProduct.lessOrdered(orderedQuantity)) {
+            if (inputView.notifyLessOrdered(order.getProductName(), get)) {
+                orderedQuantity += get;
+            }
         }
+
         return orderedQuantity;
     }
 
     private void processNonPromotionalOrder(ShoppingCart cart, Order order) {
-        if (order.getQuantity() <= 0) {
+        if (order.hasNoQuantity()) {
             return;
         }
+
         Product nonPromotionalProduct = productService.findNonPromotionalProductByName(order.getProductName());
+
         if (exists(nonPromotionalProduct)) {
             addToCart(order, cart, nonPromotionalProduct, order.getQuantity(), 0);
         }
