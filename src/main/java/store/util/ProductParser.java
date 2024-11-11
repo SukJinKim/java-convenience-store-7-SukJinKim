@@ -16,7 +16,9 @@ public class ProductParser {
         List<String> parsedInfo = Arrays.stream(productInfo.split(DELIMITER))
                 .map(String::trim)
                 .toList();
+
         validateSize(parsedInfo);
+
         return parsedInfo;
     }
 

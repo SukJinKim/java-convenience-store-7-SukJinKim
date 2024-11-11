@@ -15,11 +15,13 @@ public class ProductReader {
 
     public static List<String> read(Path path) {
         List<String> productInfo;
+
         try (Stream<String> lines = Files.lines(path)) {
             productInfo = lines.skip(1).toList();
         } catch (IOException e) {
             throw new RuntimeException(PRODUCT_FILE_READING_FAIL.getMessage());
         }
+
         return productInfo;
     }
 }

@@ -16,7 +16,9 @@ public class PromotionParser {
         List<String> parsedInfo = Arrays.stream(promotionInfo.split(DELIMITER))
                 .map(String::trim)
                 .toList();
+
         validateSize(parsedInfo);
+
         return parsedInfo;
     }
 

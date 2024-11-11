@@ -15,11 +15,13 @@ public class PromotionReader {
 
     public static List<String> read(Path path) {
         List<String> promotionInfo;
+
         try (Stream<String> lines = Files.lines(path)) {
             promotionInfo = lines.skip(1).toList();
         } catch (IOException e) {
             throw new RuntimeException(PROMOTION_FILE_READING_FAIL.getMessage());
         }
+
         return promotionInfo;
     }
 }
