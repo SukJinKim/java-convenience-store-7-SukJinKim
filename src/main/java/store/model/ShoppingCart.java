@@ -23,39 +23,33 @@ public class ShoppingCart {
 
     public Map<String, Integer> calculateTotalPurchaseQuantityByProductName() {
         Map<String, Integer> totalQuantityByProductName = new HashMap<>();
+
         for (ShoppingItem item : shoppingItems) {
-            totalQuantityByProductName.merge(
-                    item.productName(),
-                    item.purchaseQuantity(),
-                    Integer::sum
-            );
+            totalQuantityByProductName.merge(item.productName(), item.purchaseQuantity(), Integer::sum);
         }
+
         return totalQuantityByProductName;
     }
 
     public Map<String, Integer> calculateTotalPriceByProductName() {
         Map<String, Integer> totalPriceByProductName = new HashMap<>();
+
         for (ShoppingItem item : shoppingItems) {
-            totalPriceByProductName.merge(
-                    item.productName(),
-                    item.productPrice(),
-                    Integer::sum
-            );
+            totalPriceByProductName.merge(item.productName(), item.productPrice(), Integer::sum);
         }
+
         return totalPriceByProductName;
     }
 
     public Map<String, Integer> calculateTotalFreeQuantityByProductName() {
         Map<String, Integer> totalFreeQuantityByProductName = new HashMap<>();
+
         for (ShoppingItem item : shoppingItems) {
-            if (item.freeQuantity() > 0) {
-                totalFreeQuantityByProductName.merge(
-                        item.productName(),
-                        item.freeQuantity(),
-                        Integer::sum
-                );
+            if (item.hasFreeQuantity()) {
+                totalFreeQuantityByProductName.merge(item.productName(), item.freeQuantity(), Integer::sum);
             }
         }
+
         return totalFreeQuantityByProductName;
     }
 
@@ -67,26 +61,27 @@ public class ShoppingCart {
 
     public int calculateTotalPurchaseAmount() {
         return shoppingItems.stream()
-                .mapToInt(item -> item.productPrice() * item.purchaseQuantity())
+                .mapToInt(ShoppingItem::calculatePurchaseAmount)
                 .sum();
     }
 
     public int calculateEventDiscount() {
         return shoppingItems.stream()
-                .filter(item -> item.freeQuantity() > 0)
-                .mapToInt(item -> item.productPrice() * item.freeQuantity())
+                .filter(ShoppingItem::hasFreeQuantity)
+                .mapToInt(ShoppingItem::calculateEventDiscount)
                 .sum();
     }
 
     public int calculateNonPromotionalAmount() {
         List<String> promotionalProductNames = shoppingItems.stream()
-                .filter(item -> item.freeQuantity() > 0)
+                .filter(ShoppingItem::hasFreeQuantity)
                 .map(ShoppingItem::productName)
                 .toList();
+
         return shoppingItems.stream()
-                .filter(item -> item.freeQuantity() == 0)
+                .filter(ShoppingItem::hasFreeQuantity)
                 .filter(item -> !promotionalProductNames.contains(item.productName()))
-                .mapToInt(item -> item.productPrice() * item.purchaseQuantity())
+                .mapToInt(ShoppingItem::calculatePurchaseAmount)
                 .sum();
     }
 }
