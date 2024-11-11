@@ -17,11 +17,11 @@ public class Order {
         return quantity;
     }
 
-    public void minusQuantity(int quantity) {
+    public void reduceQuantity(int quantity) {
         this.quantity -= quantity;
     }
 
-    public void zeroQuantity() {
+    public void reduceAllQuantity() {
         this.quantity = 0;
     }
 }
