@@ -24,4 +24,8 @@ public class Order {
     public void reduceAllQuantity() {
         this.quantity = 0;
     }
+
+    public boolean hasQuantity() {
+        return quantity > 0;
+    }
 }
